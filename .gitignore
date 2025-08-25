@@ -37,3 +37,11 @@ node_modules/
 # Others
 *.lock
 
+
+# Project ignores (non-core)
+docs/
+test.js
+CLAUDE.md
+脚本大全.md
+uv.lock
+
