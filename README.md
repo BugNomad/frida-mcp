@@ -29,7 +29,7 @@ frida-mcp/
 
 ```bash
 # Clone repository
-git clone http://git.dev.sh.ctripcorp.com/octopus/frida-mcp.git
+git clone https://github.com/zhizhuodemao/frida-mcp
 cd frida-mcp
 
 # Install dependencies (choose one method)
@@ -151,7 +151,7 @@ frida-mcp/
 
 ```bash
 # 克隆仓库
-git clone http://git.dev.sh.ctripcorp.com/octopus/frida-mcp.git
+git clone https://github.com/zhizhuodemao/frida-mcp
 cd frida-mcp
 
 # 安装依赖（选择一种方法）
