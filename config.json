@@ -1,7 +1,7 @@
 {
-  "server_path": "/data/local/myfr",
-  "server_name": "aaabbb",
-  "server_port": 27042,
+  "server_path": "/data/local/mypfr",
+  "server_name": "p-fs-arm64-17.4.0",
+  "server_port": 21111,
   "device_id": null,
   "adb_path": "adb"
 }
