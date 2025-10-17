@@ -1,11 +1,27 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "frida-mcp"
 version = "0.1.0"
-description = "Add your description here"
+description = "Frida MCP integration and device management utilities"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT"
+authors = [
+    { name = "Your Name", email = "you@example.com" }
+]
+
 dependencies = [
-    "frida==16.2.1",
+    "frida>=16.2.1",
     "mcp[cli,fastmcp]>=1.13.1",
     "pydantic>=2.11.7",
 ]
+
+[project.scripts]
+frida-mcp = "frida_mcp:app.run"
+
+[tool.setuptools]
+# 告诉 setuptools 这些顶级模块文件存在
+py-modules = ["frida_mcp", "device_manager", "kill_process"]

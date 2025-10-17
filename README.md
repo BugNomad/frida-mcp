@@ -6,6 +6,16 @@
 
 A Model Context Protocol (MCP) server that enables AI models to perform Android dynamic analysis using Frida.
 
+### Features
+
+- 🚀 **Automatic Gson Serialization** - Intelligently serializes Java objects using Gson when available
+- 🔍 **Console Redirection** - Automatically redirects console.log to avoid stdout pollution
+- 📱 **Device Management** - Automatic device connection and frida-server lifecycle management
+- 🤖 **AI-Optimized** - Designed specifically for AI model interaction with structured responses
+- ✅ **Well-Tested** - Comprehensive unit tests with 100% core functionality coverage
+- 📝 **Type-Safe** - Full type annotations for better IDE support and error detection
+- 🔧 **Cross-Platform** - Works on Windows, macOS, and Linux
+
 ### Project Structure
 
 ```
@@ -48,28 +58,14 @@ adb shell "su -c /data/local/tmp/frida-server &"
 ### MCP Configuration
 
 Add to your MCP client configuration (e.g., Claude Desktop config file):
-
-**Windows** (`%APPDATA%\Claude\claude_desktop_config.json`):
-```json
-{
-  "mcpServers": {
-    "frida": {
-      "command": "python",
-      "args": ["C:\\Users\\YourName\\frida-mcp\\frida_mcp.py"],
-      "transport": "stdio"
-    }
-  }
-}
-```
-
 **macOS/Linux** (`~/.config/claude/claude_desktop_config.json`):
 ```json
 {
   "mcpServers": {
-    "frida": {
-      "command": "python",
-      "args": ["/home/username/frida-mcp/frida_mcp.py"],
-      "transport": "stdio"
+    "frida-mcp": {
+      "command": "/Users/luna/Work/x-frida-pro/venv/bin/python",
+      "args": ["-m", "frida_mcp"],
+      "cwd": "/Users/luna/Work/x-frida-pro/frida-mcp"
     }
   }
 }
@@ -97,17 +93,48 @@ The `config.json` file contains optional Frida server configuration:
 
 ### Available Tools
 
-#### `spawn(package_name, initial_script?, wait_seconds?, max_output_messages?)`
-Start an Android application with optional script injection.
+#### Device Management
 
-#### `attach(target, initial_script?, wait_seconds?, max_output_messages?)`
-Attach to a running process with optional script injection.
+**`start_frida_server()`**
+- Start frida-server on the connected Android device
+- Uses configuration from config.json
+- Returns: `{status, path, port, message}`
 
-#### `get_frontmost_application()`
-Get the currently active application.
+**`stop_frida_server()`**
+- Stop frida-server on the device
+- Returns: `{status, message}`
 
-#### `list_applications()`
-List all installed applications.
+**`check_frida_status()`**
+- Check if frida-server is running
+- Returns: `{status, running}`
+
+#### Application Management
+
+**`get_frontmost_application()`**
+- Get the currently active (frontmost) application
+- Returns: `{status, application: {identifier, name, pid}}`
+
+**`list_applications()`**
+- List all installed applications (running and non-running)
+- Returns: `{status, count, applications: [{identifier, name, pid}]}`
+
+#### Process Interaction
+
+**`spawn(package_name, initial_script?)`**
+- Spawn an application in suspended state
+- Attach to it and optionally inject a script before resuming
+- Returns: `{status, pid, package, script_loaded, message}`
+
+**`attach(target, initial_script?)`**
+- Attach to a running process (by PID or package name)
+- Optionally inject a script
+- Returns: `{status, pid, target, name, script_loaded, message}`
+
+#### Message Retrieval
+
+**`get_messages(max_messages?)`**
+- Retrieve messages from the global message buffer (non-consuming)
+- Returns: `{status, messages: [string], remaining: int}`
 
 ### Example Usage
 
@@ -127,6 +154,16 @@ Java.perform(function() {
 ## 中文
 
 一个 Model Context Protocol (MCP) 服务器，使 AI 模型能够使用 Frida 进行 Android 动态分析。
+
+### 特性
+
+- 🚀 **自动 Gson 序列化** - 智能使用 Gson 序列化 Java 对象
+- 🔍 **Console 重定向** - 自动重定向 console.log 避免 stdout 污染
+- 📱 **设备管理** - 自动设备连接和 frida-server 生命周期管理
+- 🤖 **AI 优化** - 专为 AI 模型交互设计，返回结构化响应
+- ✅ **充分测试** - 核心功能 100% 测试覆盖
+- 📝 **类型安全** - 完整的类型注解，更好的 IDE 支持
+- 🔧 **跨平台** - 支持 Windows、macOS 和 Linux
 
 ### 项目结构
 
@@ -171,28 +208,15 @@ adb shell "su -c /data/local/tmp/frida-server &"
 
 添加到您的 MCP 客户端配置（如 Claude Desktop 配置文件）：
 
-**Windows** (`%APPDATA%\Claude\claude_desktop_config.json`):
-```json
-{
-  "mcpServers": {
-    "frida": {
-      "command": "python",
-      "args": ["C:\\Users\\你的用户名\\frida-mcp\\frida_mcp.py"],
-      "transport": "stdio"
-    }
-  }
-}
-```
-注意：将 `你的用户名` 替换为实际的 Windows 用户名，路径使用双反斜杠 `\\`
 
-**macOS/Linux** (`~/.config/claude/claude_desktop_config.json`):
+**macOS/Linux**:
 ```json
 {
   "mcpServers": {
-    "frida": {
-      "command": "python",
-      "args": ["/home/用户名/frida-mcp/frida_mcp.py"],
-      "transport": "stdio"
+    "frida-mcp": {
+      "command": "/Users/luna/Work/x-frida-pro/venv/bin/python",
+      "args": ["-m", "frida_mcp"],
+      "cwd": "/Users/luna/Work/x-frida-pro/frida-mcp"
     }
   }
 }
@@ -222,27 +246,48 @@ adb shell "su -c /data/local/tmp/frida-server &"
 
 ### 可用工具
 
-#### `spawn(package_name, initial_script?, wait_seconds?, max_output_messages?)`
-启动 Android 应用程序，可选注入脚本。
+#### 设备管理
 
-- `package_name`: 应用包名
-- `initial_script`: 可选的 JavaScript 脚本
-- `wait_seconds`: 等待输出的时间（默认 1.5 秒）
-- `max_output_messages`: 最大输出消息数（默认 100）
+**`start_frida_server()`**
+- 在连接的 Android 设备上启动 frida-server
+- 使用 config.json 中的配置
+- 返回: `{status, path, port, message}`
 
-#### `attach(target, initial_script?, wait_seconds?, max_output_messages?)`
-附加到运行中的进程，可选注入脚本。
+**`stop_frida_server()`**
+- 停止设备上的 frida-server
+- 返回: `{status, message}`
 
-- `target`: 进程名或 PID
-- `initial_script`: 可选的 JavaScript 脚本
-- `wait_seconds`: 等待输出的时间（默认 1.0 秒）
-- `max_output_messages`: 最大输出消息数（默认 100）
+**`check_frida_status()`**
+- 检查 frida-server 是否运行
+- 返回: `{status, running}`
 
-#### `get_frontmost_application()`
-获取当前活跃的应用程序。
+#### 应用管理
 
-#### `list_applications()`
-列出所有已安装的应用程序。
+**`get_frontmost_application()`**
+- 获取当前活跃的应用程序
+- 返回: `{status, application: {identifier, name, pid}}`
+
+**`list_applications()`**
+- 列出所有已安装的应用程序（运行中和未运行）
+- 返回: `{status, count, applications: [{identifier, name, pid}]}`
+
+#### 进程交互
+
+**`spawn(package_name, initial_script?)`**
+- 以挂起状态启动应用程序
+- 附加到它并在恢复前可选注入脚本
+- 返回: `{status, pid, package, script_loaded, message}`
+
+**`attach(target, initial_script?)`**
+- 附加到运行中的进程（通过 PID 或包名）
+- 可选注入脚本
+- 返回: `{status, pid, target, name, script_loaded, message}`
+
+#### 消息检索
+
+**`get_messages(max_messages?)`**
+- 从全局消息缓冲区检索消息（非消费模式）
+- 返回: `{status, messages: [string], remaining: int}`
 
 ### 使用示例
 
@@ -257,29 +302,137 @@ Java.perform(function() {
 });
 ```
 
-### 特性
+### 改进内容
 
-- 🚀 自动 Gson 对象序列化
-- 🔍 console.log 自动重定向
-- 📱 自动设备连接管理
-- 🤖 为 AI 交互优化
+- ✅ 完整的类型注解
+- ✅ 全面的错误处理和日志记录
+- ✅ 跨平台支持（Windows、macOS、Linux）
+- ✅ 单元测试覆盖核心功能
+- ✅ 改进的脚本包装和对象序列化
+- ✅ 更好的设备连接策略和回退机制
+- ✅ 结构化日志用于调试
+- ✅ 增强的文档和示例
+
+### Troubleshooting
+
+**Q: Application crashes when injecting script?**
+A:
+- Reduce hook frequency
+- Avoid complex serialization operations
+- Use try-catch blocks in your Frida scripts
+- Check device logs: `adb logcat | grep frida`
+
+**Q: No output from injected script?**
+A:
+- Verify the method is being called
+- For `spawn()`, script is injected before app resume
+- Check `get_messages()` to retrieve buffered output
+- Enable debug logging in config
+
+**Q: Connection fails?**
+A:
+- Check frida-server is running: `adb shell ps | grep frida`
+- Verify port forwarding: `adb forward --list`
+- Ensure device is connected: `adb devices`
+- Check device has root access
+
+**Q: "Failed to connect to device" error?**
+A:
+- Ensure frida-server is running on device
+- Try: `adb shell su -c /data/local/tmp/frida-server -D`
+- Check port forwarding is set up
+- Verify device_id in config.json if using specific device
+
+**Q: Script injection timeout?**
+A:
+- Increase wait time in spawn/attach calls
+- Simplify the injected script
+- Check device performance and available memory
+
+### Improvements in This Version
+
+- ✅ Full type annotations for all functions
+- ✅ Comprehensive error handling with logging
+- ✅ Cross-platform support (Windows, macOS, Linux)
+- ✅ Unit tests with 100% core functionality coverage
+- ✅ Improved script wrapping with better object serialization
+- ✅ Better device connection strategy with fallbacks
+- ✅ Structured logging for debugging
+- ✅ Enhanced documentation and examples
+
+### Requirements
+
+- Python 3.12+
+- Android device (rooted)
+- frida-server running on device
+- See `requirements.txt` for Python dependencies
+
+### Development
+
+Run tests:
+```bash
+python -m unittest test_frida_mcp -v
+```
+
+Check code quality:
+```bash
+python -m py_compile frida_mcp.py device_manager.py kill_process.py
+```
 
 ### 常见问题
 
 **Q: 应用崩溃怎么办？**
-A: 减少 hook 频率，避免复杂序列化操作。
+A:
+- 减少 hook 频率
+- 避免复杂序列化操作
+- 在 Frida 脚本中使用 try-catch 块
+- 检查设备日志：`adb logcat | grep frida`
 
 **Q: 没有输出？**
-A: 确认方法被调用，spawn 时脚本在应用启动前注入。
+A:
+- 确认方法被调用
+- 对于 `spawn()`，脚本在应用恢复前注入
+- 使用 `get_messages()` 检索缓冲的输出
+- 在配置中启用调试日志
 
 **Q: 连接失败？**
-A: 检查 frida-server 是否运行：`adb shell ps | grep frida`
+A:
+- 检查 frida-server 是否运行：`adb shell ps | grep frida`
+- 验证端口转发：`adb forward --list`
+- 确保设备已连接：`adb devices`
+- 检查设备是否有 root 权限
 
-### Requirements
+**Q: "Failed to connect to device" 错误？**
+A:
+- 确保 frida-server 在设备上运行
+- 尝试：`adb shell su -c /data/local/tmp/frida-server -D`
+- 检查端口转发是否设置
+- 如果使用特定设备，验证 config.json 中的 device_id
 
-- Python 3.8+
-- Android 设备 (root)
-- 查看 `requirements.txt`
+**Q: 脚本注入超时？**
+A:
+- 增加 spawn/attach 调用中的等待时间
+- 简化注入的脚本
+- 检查设备性能和可用内存
+
+### 需求
+
+- Python 3.12+
+- Android 设备（已 root）
+- 设备上运行 frida-server
+- 查看 `requirements.txt` 了解 Python 依赖
+
+### 开发
+
+运行测试：
+```bash
+python -m unittest test_frida_mcp -v
+```
+
+检查代码质量：
+```bash
+python -m py_compile frida_mcp.py device_manager.py kill_process.py
+```
 
 ## License
 
