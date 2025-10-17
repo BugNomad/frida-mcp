@@ -42,11 +42,7 @@ frida-mcp/
 git clone https://github.com/zhizhuodemao/frida-mcp
 cd frida-mcp
 
-# Install dependencies (choose one method)
-# Method 1: Using pip + requirements.txt
-pip install -r requirements.txt
-
-# Method 2: Using pip + pyproject.toml (recommended)
+# Using pip + pyproject.toml (recommended)
 pip install -e .
 
 # Setup frida-server on Android device
